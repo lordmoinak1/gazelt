@@ -204,11 +204,11 @@ class NIH_CXR_Teacher_Dataset(torch.utils.data.Dataset):
         name = self.img_paths[idx].split('/')[-1]
         name = name.split('.png')[0]
 
-        focal_features = np.load('/data04/shared/moibhattacha/model_outputs/gaze_lt/focal_{}.npy'.format(name))#.detach().cpu()
-        global_features = np.load('/data04/shared/moibhattacha/model_outputs/gaze_lt/global_{}.npy'.format(name))#.detach().cpu()
+        focal_features = np.load('/path/to/model_outputs/gaze_lt/focal_{}.npy'.format(name))#.detach().cpu()
+        global_features = np.load('/path/to/model_outputs/gaze_lt/global_{}.npy'.format(name))#.detach().cpu()
 
-        # focal_features = np.load('/data05/shared/moibhattacha/gazelt/features/nih/focal_{}.npy'.format(name))#.detach().cpu()
-        # global_features = np.load('/data05/shared/moibhattacha/gazelt/features/nih/global_{}.npy'.format(name))#.detach().cpu()
+        # focal_features = np.load('/path/to/gazelt/features/nih/focal_{}.npy'.format(name))#.detach().cpu()
+        # global_features = np.load('/path/to/gazelt/features/nih/global_{}.npy'.format(name))#.detach().cpu()
         
         return x.float(), focal_features, global_features, torch.from_numpy(y).long()
     
@@ -262,11 +262,11 @@ class MIMIC_CXR_Teacher_Dataset(torch.utils.data.Dataset):
         name = self.img_paths[idx].split('/')[-1]
         name = name.split('.jpg')[0]
 
-        # focal_features = np.load('/data04/shared/moibhattacha/model_outputs/gaze_lt_mimic/focal_{}.npy'.format(name))#.detach().cpu()
-        # global_features = np.load('/data04/shared/moibhattacha/model_outputs/gaze_lt_mimic/global_{}.npy'.format(name))#.detach().cpu()
+        # focal_features = np.load('/path/to/model_outputs/gaze_lt_mimic/focal_{}.npy'.format(name))#.detach().cpu()
+        # global_features = np.load('/path/to/model_outputs/gaze_lt_mimic/global_{}.npy'.format(name))#.detach().cpu()
 
-        focal_features = np.load('/data05/shared/moibhattacha/gazelt/features/mimic/focal_{}.npy'.format(name))#.detach().cpu()
-        global_features = np.load('/data05/shared/moibhattacha/gazelt/features/mimic/global_{}.npy'.format(name))#.detach().cpu()
+        focal_features = np.load('/path/to/gazelt/features/mimic/focal_{}.npy'.format(name))#.detach().cpu()
+        global_features = np.load('/path/to/gazelt/features/mimic/global_{}.npy'.format(name))#.detach().cpu()
 
         return x.float(), focal_features, global_features, torch.from_numpy(y).long()
 
@@ -319,7 +319,7 @@ class NIH_CXR_RadioTransformer_Dataset(torch.utils.data.Dataset):
         name = self.img_paths[idx].split('/')[-1]
         name = name.split('.png')[0]
 
-        radiotransformer_features = np.load('/data04/shared/moibhattacha/model_outputs/radiotransformer/radiotransformer_{}.npy'.format(name))#.detach().cpu()
+        radiotransformer_features = np.load('/path/to/model_outputs/radiotransformer/radiotransformer_{}.npy'.format(name))#.detach().cpu()
         radiotransformer_features = np.squeeze(radiotransformer_features, axis=0)
         
         return x.float(), radiotransformer_features, torch.from_numpy(y).long()
@@ -373,7 +373,7 @@ class NIH_CXR_GazeRadar_Dataset(torch.utils.data.Dataset):
         name = self.img_paths[idx].split('/')[-1]
         name = name.split('.png')[0]
 
-        gazeradar_features = np.load('/data04/shared/moibhattacha/model_outputs/gazeradar/gazeradar_{}.npy'.format(name))#.detach().cpu()
+        gazeradar_features = np.load('/path/to/model_outputs/gazeradar/gazeradar_{}.npy'.format(name))#.detach().cpu()
         gazeradar_features = np.squeeze(gazeradar_features, axis=0)
 
         return x.float(), gazeradar_features, torch.from_numpy(y).long()
@@ -430,7 +430,7 @@ class MIMIC_CXR_RadioTransformer_Dataset(torch.utils.data.Dataset):
         name = self.img_paths[idx].split('/')[-1]
         name = name.split('.jpg')[0]
 
-        radiotransformer_features = np.load('/data04/shared/moibhattacha/model_outputs/radiotransformer_mimic/radiotransformer_{}.npy'.format(name))#.detach().cpu()
+        radiotransformer_features = np.load('/path/to/model_outputs/radiotransformer_mimic/radiotransformer_{}.npy'.format(name))#.detach().cpu()
         radiotransformer_features = np.squeeze(radiotransformer_features, axis=0)
 
         return x.float(), radiotransformer_features, torch.from_numpy(y).long()
@@ -487,7 +487,7 @@ class MIMIC_CXR_GazeRadar_Dataset(torch.utils.data.Dataset):
         name = self.img_paths[idx].split('/')[-1]
         name = name.split('.jpg')[0]
 
-        gazeradar_features = np.load('/data04/shared/moibhattacha/model_outputs/gazeradar_mimic/gazeradar_{}.npy'.format(name))#.detach().cpu()
+        gazeradar_features = np.load('/path/to/model_outputs/gazeradar_mimic/gazeradar_{}.npy'.format(name))#.detach().cpu()
         gazeradar_features = np.squeeze(gazeradar_features, axis=0)
         
         return x.float(), gazeradar_features, torch.from_numpy(y).long()
