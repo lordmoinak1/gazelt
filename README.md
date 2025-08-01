@@ -22,7 +22,7 @@ CUDA_VISIBLE_DEVICES=X python3 src/main_gazelt.py \
                     --batch_size 256 \
                     --lr 1e-4 \
 
-CUDA_VISIBLE_DEVICES=2 python src/main_gazelt.py \
+CUDA_VISIBLE_DEVICES=X python src/main_gazelt.py \
                     --data_dir /path/to/physionet.org/files/mimic-cxr-jpg/2.0.0 \
                     --label_dir /path/to/LongTailCXR/labels \
                     --out_dir mimic_results_gazelt \
