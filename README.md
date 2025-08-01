@@ -7,6 +7,7 @@ Download weights from [here](https://drive.google.com/drive/folders/1q4Z6xwxnQQr
 
 ## Datasets
 Download: [MIMIC-CXR-LT](https://physionet.org/content/mimic-cxr/2.0.0/), [NIH-CXR-LT](https://nihcc.app.box.com/v/ChestXray-NIHCC/) 
+Labels: [HERE](https://drive.google.com/drive/folders/1tlaoqIRBdJWcjIDXVYRE1BOmUtwc_qW-?usp=sharing)
 
 ## Training
 ```bash
