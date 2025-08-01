@@ -5,6 +5,8 @@
 
 Under review.
 
+Download weights from [here](https://drive.google.com/drive/folders/1q4Z6xwxnQQr26GfkSWIjHmZoUaEJe87a?usp=sharing)
+
 ## Training
 ```bash
 CUDA_VISIBLE_DEVICES=X python3 src/main_gazelt.py \
