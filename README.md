@@ -141,7 +141,7 @@ Reported:
 - **Balanced accuracy ↑** on imbalanced test sets  
 _Best and second-best results are in **bold** and _italicized_ respectively._
 
-| Method               | NIH-CXR-LT                                   |                              |          |          |          | MIMIC-CXR-LT                                |          |          |          |          |
+| Method               | NIH-CXR-LT                                  | MIMIC-CXR-LT                              
 |----------------------|----------------------------------------------|------------------------------|----------|----------|----------|---------------------------------------------|----------|----------|----------|----------|
 |                      | Head        | Medium     | Tail     | Avg      | bAcc     | Head        | Medium     | Tail     | Avg      | bAcc     |
 |----------------------|-------------|------------|----------|----------|----------|-------------|------------|----------|----------|----------|
