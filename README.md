@@ -7,11 +7,28 @@
 
 ## 🔗 Resources
 
-- **Pre-trained Weights**: [Download here](https://drive.google.com/drive/folders/1q4Z6xwxnQQr26GfkSWIjHmZoUaEJe87a?usp=sharing)
+- **Pre-trained Weights**: [Download here](https://drive.google.com/drive/folders/10wA9KePZ6Yux2G_jiI9Y2urgYDJP_S4b?usp=share_link)
 - **Datasets**:
-  - [MIMIC-CXR-LT](https://physionet.org/content/mimic-cxr/2.0.0/)
-  - [NIH-CXR-LT](https://nihcc.app.box.com/v/ChestXray-NIHCC/)
-- **Label Files**: [Download here](https://drive.google.com/drive/folders/1tlaoqIRBdJWcjIDXVYRE1BOmUtwc_qW-?usp=sharing)
+  - [MIMIC-CXR-JPG v2.1.0](https://physionet.org/content/mimic-cxr-jpg/2.1.0/)
+  - [NIH ChestX-ray14](https://nihcc.app.box.com/v/ChestXray-NIHCC)
+
+  After downloading, organize as follows:
+  ```bash
+  mkdir -p data/nih
+  mkdir -p data/mimic
+
+  # Place NIH images (and metadata if needed) into:
+  # data/nih/
+
+  # Place MIMIC-CXR-JPG files into:
+  # data/mimic/
+- **Label Files**:
+  - Download and place inside a `labels/` directory:
+    ```bash
+    mkdir -p labels
+    # Download from browser or manually place contents of:
+    # https://drive.google.com/drive/folders/1tlaoqIRBdJWcjIDXVYRE1BOmUtwc_qW-?usp=sharing
+    ```
 
 ---
 
