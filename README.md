@@ -5,6 +5,9 @@ Under review.
 
 Download weights from [here](https://drive.google.com/drive/folders/1q4Z6xwxnQQr26GfkSWIjHmZoUaEJe87a?usp=sharing)
 
+## Datasets
+Download: [MIMIC-CXR-LT](https://physionet.org/content/mimic-cxr/2.0.0/), [NIH-CXR-LT](https://nihcc.app.box.com/v/ChestXray-NIHCC/) 
+
 ## Training
 ```bash
 CUDA_VISIBLE_DEVICES=X python3 src/main_gazelt.py \
