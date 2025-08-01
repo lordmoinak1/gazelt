@@ -150,10 +150,10 @@ class FocalBlock(torch.nn.Module):
         return layer_0, layer_1, layer_2, layer_3, x_feat
 
 class GlobalTeacher(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, data_path=None):
         super(GlobalTeacher, self).__init__()
         self.global_encoder_x = GlobalBlock()
-        self.global_encoder_x.load_state_dict(torch.load('/path/to/global/global_epoch_99_attentionloss_0.002267777990709874.pt'))
+        self.global_encoder_x.load_state_dict(torch.load(data_path))
         self.global_avgpool = nn.AdaptiveAvgPool1d(1)
         self.global_linear = nn.Linear(512, 64)
 
@@ -166,10 +166,10 @@ class GlobalTeacher(torch.nn.Module):
         return x_global
     
 class FocalTeacher(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, data_path=None):
         super(FocalTeacher, self).__init__()
         self.focal_encoder_x = FocalBlock()
-        self.focal_encoder_x.load_state_dict(torch.load('/path/to/focal/focal_epoch_99_attentionloss_0.0024850438985595247.pt'))
+        self.focal_encoder_x.load_state_dict(torch.load(data_path))
         self.focal_avgpool = nn.AdaptiveAvgPool1d(1)
         self.focal_linear = nn.Linear(768, 64)
 
@@ -181,13 +181,13 @@ class FocalTeacher(torch.nn.Module):
         x_focal = self.focal_linear(x_focal.squeeze()) 
         return x_focal
     
-def generate_features_global_nih():
-    model = GlobalTeacher()
+def generate_features_global_nih(model_path=None, data_path=None, labels_path=None):
+    model = GlobalTeacher(data_path)
     model = model.to(device)
 
-    train_dataset = NIH_CXR_Dataset(data_dir='/path/to/nih/images', label_dir='/path/to/LongTailCXR/labels', split='train')
-    val_dataset = NIH_CXR_Dataset(data_dir='/path/to/nih/images', label_dir='/path/to/LongTailCXR/labels', split='balanced-val')
-    bal_test_dataset = NIH_CXR_Dataset(data_dir='/path/to/nih/images', label_dir='/path/to/LongTailCXR/labels', split='balanced-test')
+    train_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='train')
+    val_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='balanced-val')
+    bal_test_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='test')
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True) #, worker_init_fn=worker_init_fn)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
@@ -199,13 +199,13 @@ def generate_features_global_nih():
             outputs = model(images)
         np.save('/path/to/nih/global_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
 
-def generate_features_focal_nih():
-    model = FocalTeacher()
+def generate_features_focal_nih(model_path=None, data_path=None, labels_path=None):
+    model = FocalTeacher(data_path)
     model = model.to(device)
 
-    train_dataset = NIH_CXR_Dataset(data_dir='/path/to/nih/images', label_dir='/path/to/LongTailCXR/labels', split='train')
-    val_dataset = NIH_CXR_Dataset(data_dir='/path/to/nih/images', label_dir='/path/to/LongTailCXR/labels', split='balanced-val')
-    bal_test_dataset = NIH_CXR_Dataset(data_dir='/path/to/nih/images', label_dir='/path/to/LongTailCXR/labels', split='test')
+    train_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='train')
+    val_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='balanced-val')
+    bal_test_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='test')
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True) #, worker_init_fn=worker_init_fn)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
@@ -229,14 +229,14 @@ def generate_features_focal_nih():
             outputs = model(images)
         np.save('/path/to/nih/focal_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
 
-def generate_features_global_mimic():
-    model = GlobalTeacher()
+def generate_features_global_mimic(model_path=None, data_path=None, labels_path=None):
+    model = GlobalTeacher(data_path)
     model = model.to(device)
     model.eval()
 
-    train_dataset = MIMIC_CXR_Dataset(data_dir='/path/to/mimic_cxr_jpg/physionet.org/files/mimic-cxr-jpg/2.0.0', label_dir='/path/to/LongTailCXR/labels', split='train')
-    val_dataset = MIMIC_CXR_Dataset(data_dir='/path/to/mimic_cxr_jpg/physionet.org/files/mimic-cxr-jpg/2.0.0', label_dir='/path/to/LongTailCXR/labels', split='balanced-val')
-    bal_test_dataset = MIMIC_CXR_Dataset(data_dir='/path/to/mimic_cxr_jpg/physionet.org/files/mimic-cxr-jpg/2.0.0', label_dir='/path/to/LongTailCXR/labels', split='test')
+    train_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='train')
+    val_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='balanced-val')
+    bal_test_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='test')
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True) #, worker_init_fn=worker_init_fn)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
@@ -260,14 +260,14 @@ def generate_features_global_mimic():
             outputs = model(images)
         np.save('/path/to/mimic/global_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
 
-def generate_features_focal_mimic():
-    model = FocalTeacher()
+def generate_features_focal_mimic(model_path=None, data_path=None, labels_path=None):
+    model = FocalTeacher(data_path)
     model = model.to(device)
     model.eval()
 
-    train_dataset = MIMIC_CXR_Dataset(data_dir='/path/to/mimic_cxr_jpg/physionet.org/files/mimic-cxr-jpg/2.0.0', label_dir='/path/to/LongTailCXR/labels', split='train')
-    val_dataset = MIMIC_CXR_Dataset(data_dir='/path/to/mimic_cxr_jpg/physionet.org/files/mimic-cxr-jpg/2.0.0', label_dir='/path/to/LongTailCXR/labels', split='balanced-val')
-    bal_test_dataset = MIMIC_CXR_Dataset(data_dir='/path/to/mimic_cxr_jpg/physionet.org/files/mimic-cxr-jpg/2.0.0', label_dir='/path/to/LongTailCXR/labels', split='test')
+    train_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='train')
+    val_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='balanced-val')
+    bal_test_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='test')
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True) #, worker_init_fn=worker_init_fn)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
@@ -293,9 +293,3 @@ def generate_features_focal_mimic():
 
 if __name__ == '__main__':
     flag = 0
-
-    # generate_features_global_nih()
-    # generate_features_focal_nih()
-
-    # generate_features_global_mimic()
-    # generate_features_focal_mimic()
