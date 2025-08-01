@@ -16,6 +16,7 @@
   ```bash
   mkdir -p data/nih
   mkdir -p data/mimic
+  ```
 
   # Place NIH images (and metadata if needed) into:
   # data/nih/
