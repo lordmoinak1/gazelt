@@ -1,0 +1,11 @@
+einops
+numpy
+pandas
+torch
+torchvision
+scikit-learn
+opencv-python
+matplotlib
+tqdm
+mlxtend
+timm
