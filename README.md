@@ -51,7 +51,7 @@ conda create -n gazelt_env python=3.8 -y
 conda activate gazelt_env
 ```
 
-# Install dependencies
+## Install dependencies
 ```pip install -r requirements.txt```
 
 
