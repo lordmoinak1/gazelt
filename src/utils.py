@@ -385,3 +385,245 @@ def evaluate(model, device, loss_fxn, dataset, split, batch_size, history, model
     f = open(os.path.join(model_dir, f'{split}_summary.txt'), 'w')
     f.write(summary)
     f.close()
+
+
+def train_teacher(model, device, loss_fxn, optimizer, data_loader, history, epoch, model_dir, classes, mixup, mixup_alpha):
+    pbar = tqdm.tqdm(enumerate(data_loader), total=len(data_loader), desc=f'Epoch {epoch}')
+
+    feature_extractor = create_feature_extractor(model, return_nodes=['fc.0'])
+
+    running_loss = 0.
+    y_true, y_hat = [], []
+    for i, (x, focal_features, global_features, y) in pbar:
+        x = x.to(device)
+        y = y.to(device)
+
+        # focal_features = torch.randn(focal_features.shape[0], 64)
+        # global_features = torch.randn(global_features.shape[0], 64)
+
+        focal_features = focal_features.to(device)
+        global_features = global_features.to(device)
+
+        if mixup:
+            x, y_a, y_b, lam = mixup_data(x, y, mixup_alpha, True)
+
+        out = model(x)
+
+        model_feats = feature_extractor(x)['fc.0']
+
+        if mixup:
+            loss_cls = mixup_criterion(loss_fxn, out, y_a, y_b, lam)
+        else:
+            loss_cls = loss_fxn(out, y)
+
+        kd_loss = bhattacharyya_loss(model_feats.squeeze(), focal_features, global_features)
+
+        lambda_1 = 0.01
+        loss = loss_cls + lambda_1*kd_loss
+
+        for param in model.parameters():
+            param.grad = None
+        loss.backward()
+        optimizer.step()
+
+        running_loss += loss.item()
+
+        y_hat.append(out.softmax(dim=1).detach().cpu().numpy())
+        y_true.append(y.detach().cpu().numpy())
+
+        pbar.set_postfix({'loss': running_loss / (i + 1)})
+
+    # Collect true and predicted labels into flat numpy arrays
+    y_true, y_hat = np.concatenate(y_true), np.concatenate(y_hat)
+
+    # Compute metrics
+    auc = roc_auc_score(y_true, y_hat, average='macro', multi_class='ovr')
+    b_acc = balanced_accuracy_score(y_true, y_hat.argmax(axis=1))
+    mcc = matthews_corrcoef(y_true, y_hat.argmax(axis=1))
+
+    print('Balanced Accuracy:', round(b_acc, 3), '|', 'MCC:', round(mcc, 3), '|', 'AUC:', round(auc, 3))
+
+    current_metrics = pd.DataFrame([[epoch, 'train', running_loss / (i + 1), b_acc, mcc, auc]], columns=history.columns)
+    current_metrics.to_csv(os.path.join(model_dir, 'history.csv'), mode='a', header=False, index=False)
+
+    history = pd.concat([history, current_metrics])
+    return history
+
+def validate_teacher(model, device, loss_fxn, optimizer, data_loader, history, epoch, model_dir, early_stopping_dict, best_model_wts, classes):
+    model.eval()
+
+    feature_extractor = create_feature_extractor(model, return_nodes=['fc.0'])
+    
+    pbar = tqdm.tqdm(enumerate(data_loader), total=len(data_loader), desc=f'[VAL] Epoch {epoch}')
+
+    running_loss = 0.
+    y_true, y_hat = [], []
+    with torch.no_grad():
+        for i, (x, focal_features, global_features, y) in pbar:
+            x = x.to(device)
+            y = y.to(device)
+
+            focal_features = focal_features.to(device)
+            global_features = global_features.to(device)
+
+            out = model(x)
+
+            model_feats = feature_extractor(x)['fc.0']
+
+            loss_cls = loss_fxn(out, y)
+
+            kd_loss = bhattacharyya_loss(model_feats.squeeze(), focal_features, global_features)
+
+            lambda_1 = 0.05
+            loss = loss_cls + lambda_1*kd_loss
+
+            running_loss += loss.item()
+
+            y_hat.append(out.softmax(dim=1).detach().cpu().numpy())
+            y_true.append(y.detach().cpu().numpy())
+
+            pbar.set_postfix({'loss': running_loss / (i + 1)})
+
+    # Collect true and predicted labels into flat numpy arrays
+    y_true, y_hat = np.concatenate(y_true), np.concatenate(y_hat)
+
+    # Compute metrics
+    auc = roc_auc_score(y_true, y_hat, average='macro', multi_class='ovr')
+    b_acc = balanced_accuracy_score(y_true, y_hat.argmax(axis=1))
+    mcc = matthews_corrcoef(y_true, y_hat.argmax(axis=1))
+
+    print('[VAL] Balanced Accuracy:', round(b_acc, 3), '|', 'MCC:', round(mcc, 3), '|', 'AUC:', round(auc, 3))
+
+    current_metrics = pd.DataFrame([[epoch, 'val', running_loss / (i + 1), b_acc, mcc, auc]], columns=history.columns)
+    current_metrics.to_csv(os.path.join(model_dir, 'history.csv'), mode='a', header=False, index=False)
+
+    # Early stopping: save model weights only when val (balanced) accuracy has improved
+    if b_acc > early_stopping_dict['best_acc']:
+        print(f'--- EARLY STOPPING: Accuracy has improved from {round(early_stopping_dict["best_acc"], 3)} to {round(b_acc, 3)}! Saving weights. ---')
+        early_stopping_dict['epochs_no_improve'] = 0
+        early_stopping_dict['best_acc'] = b_acc
+        best_model_wts = deepcopy(model.state_dict())
+        torch.save({'weights': best_model_wts, 'optimizer': optimizer.state_dict()}, os.path.join(model_dir, f'chkpt_epoch-{epoch}.pt'))
+    else:
+        print(f'--- EARLY STOPPING: Accuracy has not improved from {round(early_stopping_dict["best_acc"], 3)} ---')
+        early_stopping_dict['epochs_no_improve'] += 1
+
+    history = pd.concat([history, current_metrics])
+    return history, early_stopping_dict, best_model_wts
+
+
+def evaluate_gazelt(model, device, loss_fxn, dataset, split, batch_size, history, model_dir, weights):
+    """Evaluate PyTorch model on test set of NIH ChestXRay14 dataset. Saves training history csv, summary text file, training curves, etc.
+    Parameters
+    ----------
+        model : PyTorch model
+        device : PyTorch device
+        loss_fxn : PyTorch loss function
+        ls : int
+            Ratio of label smoothing to apply during loss computation
+        batch_size : int
+        history : pandas DataFrame
+            Data frame containing history of training metrics
+        model_dir : str
+            Path to output directory where metrics, model weights, etc. will be stored
+        weights : PyTorch state_dict
+            Model weights from best epoch
+        n_TTA : int
+            Number of augmented copies to use for test-time augmentation (0-K)
+        fusion : bool
+            Whether or not fusion is being performed (image + metadata inputs)
+        meta_only : bool
+            Whether or not to train on *only* metadata as input
+    """
+    model.load_state_dict(weights)  # load best weights
+    model.eval()
+
+    ## INFERENCE
+    data_loader  = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=8 if split == 'test' else 2, pin_memory=True, worker_init_fn=val_worker_init_fn)
+
+    pbar = tqdm.tqdm(enumerate(data_loader), total=len(data_loader), desc=f'[{split.upper()}] EVALUATION')
+
+    running_loss = 0.
+    y_true, y_hat = [], []
+    with torch.no_grad():
+        for i, (x, _, y) in pbar:
+            x = x.to(device)
+            y = y.to(device)
+
+            out = model(x)
+
+            loss = loss_fxn(out, y)
+
+            running_loss += loss.item()
+
+            y_hat.append(out.softmax(dim=1).detach().cpu().numpy())
+            y_true.append(y.detach().cpu().numpy())
+
+            pbar.set_postfix({'loss': running_loss / (i + 1)})
+
+    # Collect true and predicted labels into flat numpy arrays
+    y_true, y_hat = np.concatenate(y_true), np.concatenate(y_hat)
+
+    # Compute metrics
+    auc = roc_auc_score(y_true, y_hat, average='macro', multi_class='ovr')
+    b_acc = balanced_accuracy_score(y_true, y_hat.argmax(axis=1))
+    conf_mat = confusion_matrix(y_true, y_hat.argmax(axis=1))
+    accuracies = conf_mat.diagonal() / conf_mat.sum(axis=1)
+    mcc = matthews_corrcoef(y_true, y_hat.argmax(axis=1))
+    cls_report = classification_report(y_true, y_hat.argmax(axis=1), target_names=dataset.CLASSES, digits=3)
+
+    print(f'[{split.upper()}] Balanced Accuracy: {round(b_acc, 3)} | MCC: {round(mcc, 3)} | AUC: {round(auc, 3)}')
+
+    # Collect and save true and predicted disease labels for test set
+    pred_df = pd.DataFrame(y_hat, columns=dataset.CLASSES)
+    true_df = pd.DataFrame(LabelBinarizer().fit(range(len(dataset.CLASSES))).transform(y_true), columns=dataset.CLASSES)
+
+    pred_df.to_csv(os.path.join(model_dir, f'{split}_pred.csv'), index=False)
+    true_df.to_csv(os.path.join(model_dir, f'{split}_true.csv'), index=False)
+
+    # Plot confusion matrix
+    fig, ax = plot_confusion_matrix(conf_mat, figsize=(24, 24), colorbar=True, show_absolute=True, show_normed=True, class_names=dataset.CLASSES)
+    fig.savefig(os.path.join(model_dir, f'{split}_cm.png'), dpi=300, bbox_inches='tight')
+
+    # Plot loss curves
+    fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+    ax.plot(history.loc[history['phase'] == 'train', 'epoch'], history.loc[history['phase'] == 'train', 'loss'], label='train')
+    ax.plot(history.loc[history['phase'] == 'val', 'epoch'], history.loc[history['phase'] == 'val', 'loss'], label='val')
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Loss')
+    ax.legend()
+    fig.savefig(os.path.join(model_dir, 'loss.png'), dpi=300, bbox_inches='tight')
+
+    # Plot accuracy curves
+    fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+    ax.plot(history.loc[history['phase'] == 'train', 'epoch'], history.loc[history['phase'] == 'train', 'balanced_acc'], label='train')
+    ax.plot(history.loc[history['phase'] == 'val', 'epoch'], history.loc[history['phase'] == 'val', 'balanced_acc'], label='val')
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Balanced Accuracy')
+    ax.legend()
+    fig.savefig(os.path.join(model_dir, 'balanced_acc.png'), dpi=300, bbox_inches='tight')
+    
+    # Plot AUROC learning curves
+    fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+    ax.plot(history.loc[history['phase'] == 'train', 'epoch'], history.loc[history['phase'] == 'train', 'auroc'], label='train')
+    ax.plot(history.loc[history['phase'] == 'val', 'epoch'], history.loc[history['phase'] == 'val', 'auroc'], label='val')
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('AUROC')
+    ax.legend()
+    fig.savefig(os.path.join(model_dir, 'auc.png'), dpi=300, bbox_inches='tight')
+    
+    # Create summary text file describing final performance
+    summary = f'Balanced Accuracy: {round(b_acc, 3)}\n'
+    summary += f'Matthews Correlation Coefficient: {round(mcc, 3)}\n'
+    summary += f'Mean AUC: {round(auc, 3)}\n\n'
+
+    summary += 'Class:| Accuracy\n'
+    for i, c in enumerate(dataset.CLASSES):
+        summary += f'{c}:| {round(accuracies[i], 3)}\n'
+    summary += '\n'
+    
+    summary += cls_report
+
+    f = open(os.path.join(model_dir, f'{split}_summary.txt'), 'w')
+    f.write(summary)
+    f.close()
