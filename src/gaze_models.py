@@ -197,19 +197,19 @@ def generate_features_global_nih(model_path=None, data_path=None, labels_path=No
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
     for images, _, name in tqdm(train_loader):
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
     for images, _, name in tqdm(val_loader):
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
 def generate_features_focal_nih(model_path=None, data_path=None, labels_path=None, save_path=None):
     model = FocalTeacher(data_path)
@@ -227,19 +227,19 @@ def generate_features_focal_nih(model_path=None, data_path=None, labels_path=Non
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
     for images, _, name in tqdm(train_loader):
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
     for images, _, name in tqdm(val_loader):
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
 def generate_features_global_mimic(model_path=None, data_path=None, labels_path=None, save_path=None):
     model = GlobalTeacher(data_path)
@@ -258,19 +258,19 @@ def generate_features_global_mimic(model_path=None, data_path=None, labels_path=
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
     for images, _, name in tqdm(train_loader):
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
     for images, _, name in tqdm(val_loader):
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
 def generate_features_focal_mimic(model_path=None, data_path=None, labels_path=None, save_path=None):
     model = FocalTeacher(data_path)
@@ -289,19 +289,19 @@ def generate_features_focal_mimic(model_path=None, data_path=None, labels_path=N
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'mimic/focal_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
     for images, _, name in tqdm(train_loader):
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
     for images, _, name in tqdm(val_loader):
         images = images.to(device)
         with torch.no_grad():
             outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0]), outputs.detach().cpu().numpy())
+        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
 def main():
     parser = argparse.ArgumentParser(description="Feature Generator for NIH and MIMIC datasets")
