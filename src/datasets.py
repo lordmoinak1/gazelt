@@ -204,8 +204,8 @@ class NIH_CXR_Teacher_Dataset(torch.utils.data.Dataset):
         name = self.img_paths[idx].split('/')[-1]
         name = name.split('.png')[0]
 
-        focal_features = np.load('/path/to/model_outputs/gaze_lt/focal_{}.npy'.format(name))#.detach().cpu()
-        global_features = np.load('/path/to/model_outputs/gaze_lt/global_{}.npy'.format(name))#.detach().cpu()
+        focal_features = np.load('tw/nih/focal_{}.npy'.format(name))#.detach().cpu()
+        global_features = np.load('tw/nih/global_{}.npy'.format(name))#.detach().cpu()
         
         return x.float(), focal_features, global_features, torch.from_numpy(y).long()
     
@@ -259,8 +259,8 @@ class MIMIC_CXR_Teacher_Dataset(torch.utils.data.Dataset):
         name = self.img_paths[idx].split('/')[-1]
         name = name.split('.jpg')[0]
 
-        focal_features = np.load('/path/to/gazelt/features/mimic/focal_{}.npy'.format(name))#.detach().cpu()
-        global_features = np.load('/path/to/gazelt/features/mimic/global_{}.npy'.format(name))#.detach().cpu()
+        focal_features = np.load('tw/features/mimic/focal_{}.npy'.format(name))#.detach().cpu()
+        global_features = np.load('tw/features/mimic/global_{}.npy'.format(name))#.detach().cpu()
 
         return x.float(), focal_features, global_features, torch.from_numpy(y).long()
     
