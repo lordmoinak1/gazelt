@@ -185,6 +185,11 @@ CUDA_VISIBLE_DEVICES=X python src/main_gazelt.py \
 
 ---
 
+Replicate results shown in this Colab notebook:  
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/19bJDHJpwlhqvWciCD0Qkt3uQOjUecoVT?usp=sharing)
+
+---
+
 ## Citation
 If you find this repository useful, please consider giving a star :star: and cite the following
 ```
