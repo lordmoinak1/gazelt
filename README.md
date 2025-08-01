@@ -54,6 +54,16 @@ conda activate gazelt_env
 ## Install dependencies
 ```pip3 install -r requirements.txt```
 
+## Generate TWI and TWD features
+```bash
+    generate_features_global_nih(model_path=None, data_path=None, labels_path=None)
+    generate_features_focal_nih(model_path=None, data_path=None, labels_path=None)
+
+    generate_features_global_mimic(model_path=None, data_path=None, labels_path=None)
+    generate_features_focal_mimic(model_path=None, data_path=None, labels_path=None)
+```
+
+
 
 ## 🚀 Training Instructions
 ### NIH-CXR-LT
