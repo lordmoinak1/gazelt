@@ -31,6 +31,17 @@
 
 ---
 
+## 🚀 Getting Started
+
+Clone this repository:
+
+```bash
+git clone https://github.com/lordmoinak1/gazelt.git
+cd gazelt
+```
+
+---
+
 ## ⚙️ Environment Setup
 
 Create and activate a Conda environment:
