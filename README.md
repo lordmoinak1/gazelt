@@ -5,7 +5,7 @@
 
 ---
 ![Architecture Diagram](https://github.com/user-attachments/files/21555092/figure2.pdf)
-*Figure 1: Overview of the GazeLT architecture showing visual attention guidance for long-tailed disease classification.*
+*Figure: GazeLT employs a teacher-student framework where the teacher, trained on radiologists’ visual attention via TW-I and TW-D components using $\mathcal{L}{I-tVAL}$ and $\mathcal{L}{D-tVAL}$, guides the student by distilling knowledge with $\mathcal{L}{BD}$ alongside the long-tailed loss $\mathcal{L}{LT}$.*
 
 ---
 
