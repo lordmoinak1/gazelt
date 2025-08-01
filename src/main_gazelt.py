@@ -141,9 +141,7 @@ def main(args):
             if args.bal_mixup:
                 history = bal_mixup_train(model=model, device=device, loss_fxn=loss_fxn, optimizer=optimizer, data_loader=train_loader, history=history, epoch=epoch, model_dir=model_dir, classes=train_dataset.CLASSES, mixup_alpha=args.mixup_alpha)    
             else:
-                # history = train(model=model, device=device, loss_fxn=loss_fxn, optimizer=optimizer, data_loader=train_loader, history=history, epoch=epoch, model_dir=model_dir, classes=train_dataset.CLASSES, mixup=args.mixup, mixup_alpha=args.mixup_alpha)
                 history = train_teacher(model=model, device=device, loss_fxn=loss_fxn, optimizer=optimizer, data_loader=train_loader, history=history, epoch=epoch, model_dir=model_dir, classes=train_dataset.CLASSES, mixup=args.mixup, mixup_alpha=args.mixup_alpha)
-            # history, early_stopping_dict, best_model_wts = validate(model=model, device=device, loss_fxn=loss_fxn, optimizer=optimizer, data_loader=val_loader, history=history, epoch=epoch, model_dir=model_dir, early_stopping_dict=early_stopping_dict, best_model_wts=best_model_wts, classes=val_dataset.CLASSES)
             history, early_stopping_dict, best_model_wts = validate_teacher(model=model, device=device, loss_fxn=loss_fxn, optimizer=optimizer, data_loader=val_loader, history=history, epoch=epoch, model_dir=model_dir, early_stopping_dict=early_stopping_dict, best_model_wts=best_model_wts, classes=val_dataset.CLASSES)
 
             if args.drw and epoch == 10:
@@ -157,10 +155,10 @@ def main(args):
         best_model_wts = model.state_dict()
     
     # Evaluate on balanced test set
-    evaluate(model=model, device=device, loss_fxn=loss_fxn, dataset=bal_test_dataset, split='balanced-test', batch_size=args.batch_size, history=history, model_dir=model_dir, weights=best_model_wts)
+    evaluate_main(model=model, device=device, loss_fxn=loss_fxn, dataset=bal_test_dataset, split='balanced-test', batch_size=args.batch_size, history=history, model_dir=model_dir, weights=best_model_wts)
 
     # Evaluate on imbalanced test set
-    evaluate(model=model, device=device, loss_fxn=loss_fxn, dataset=test_dataset, split='test', batch_size=args.batch_size, history=history, model_dir=model_dir, weights=best_model_wts)
+    evaluate_main(model=model, device=device, loss_fxn=loss_fxn, dataset=test_dataset, split='test', batch_size=args.batch_size, history=history, model_dir=model_dir, weights=best_model_wts)
 
 if __name__ == '__main__':
     # Command-line arguments
