@@ -7,7 +7,8 @@
 
 ## 🔗 Resources
 
-- **Pre-trained Weights**: [Download here](https://drive.google.com/drive/folders/10wA9KePZ6Yux2G_jiI9Y2urgYDJP_S4b?usp=share_link)
+- **TWI & TWD Weights**: [Download here](https://drive.google.com/drive/folders/1nrfZ2rBj9If-yy-O3lCRqUe9bO93OaHj?usp=sharing)
+- **GazeLT Weights & Results**: [Download here](https://drive.google.com/drive/folders/10wA9KePZ6Yux2G_jiI9Y2urgYDJP_S4b?usp=share_link)
 - **Datasets**:
   - [MIMIC-CXR-JPG v2.1.0](https://physionet.org/content/mimic-cxr-jpg/2.1.0/)
   - [NIH ChestX-ray14](https://nihcc.app.box.com/v/ChestXray-NIHCC)
@@ -51,19 +52,54 @@ conda create -n gazelt_env python=3.8 -y
 conda activate gazelt_env
 ```
 
-## Install dependencies
+## 🔧 Install Dependencies
+
 ```pip3 install -r requirements.txt```
 
-## Generate TWI and TWD features
-```bash
-    generate_features_global_nih(model_path=None, data_path=None, labels_path=None)
-    generate_features_focal_nih(model_path=None, data_path=None, labels_path=None)
+---
 
-    generate_features_global_mimic(model_path=None, data_path=None, labels_path=None)
-    generate_features_focal_mimic(model_path=None, data_path=None, labels_path=None)
+## 👁️ Generate TWI and TWD Features
+
+```bash
+  mkdir -p tw/weights
+  mkdir -p tw/features/nih
+  mkdir -p tw/features/mimic
+```
+```bash
+  python3 src/gaze_models.py \
+      --global \
+      --nih \
+      --model_path tw/weights/global_epoch_99_attentionloss_0.002267777990709874.pt \
+      --data_path data/nih \
+      --labels_path labels \
+      --save_features_path tw/features/nih
+
+  python3 src/gaze_models.py \
+      --focal \
+      --nih \
+      --model_path tw/weights/focal_epoch_99_attentionloss_0.0024850438985595247.pt \
+      --data_path data/nih \
+      --labels_path labels \
+      --save_features_path tw/features/nih
+
+  python3 src/gaze_models.py \
+      --global \
+      --mimic \
+      --model_path tw/weights/global_epoch_99_attentionloss_0.002267777990709874.pt \
+      --data_path data/mimic \
+      --labels_path labels \
+      --save_features_path tw/features/nih
+
+  python3 src/gaze_models.py \
+      --focal \
+      --mimic \
+      --model_path tw/weights/focal_epoch_99_attentionloss_0.0024850438985595247.pt \
+      --data_path data/mimic \
+      --labels_path labels \
+      --save_features_path tw/features/nih
 ```
 
-
+---
 
 ## 🚀 Training Instructions
 ### NIH-CXR-LT
@@ -97,7 +133,7 @@ CUDA_VISIBLE_DEVICES=X python src/main_gazelt.py \
                     --batch_size 256 \
                     --lr 1e-4 \
 ```
-  
+
 ## Citation
 If you find this repository useful, please consider giving a star :star: and cite the following
 ```
