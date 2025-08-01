@@ -155,10 +155,10 @@ def main(args):
         best_model_wts = model.state_dict()
     
     # Evaluate on balanced test set
-    evaluate_main(model=model, device=device, loss_fxn=loss_fxn, dataset=bal_test_dataset, split='balanced-test', batch_size=args.batch_size, history=history, model_dir=model_dir, weights=best_model_wts)
+    evaluate_gazelt(model=model, device=device, loss_fxn=loss_fxn, dataset=bal_test_dataset, split='balanced-test', batch_size=args.batch_size, history=history, model_dir=model_dir, weights=best_model_wts)
 
     # Evaluate on imbalanced test set
-    evaluate_main(model=model, device=device, loss_fxn=loss_fxn, dataset=test_dataset, split='test', batch_size=args.batch_size, history=history, model_dir=model_dir, weights=best_model_wts)
+    evaluate_gazelt(model=model, device=device, loss_fxn=loss_fxn, dataset=test_dataset, split='test', batch_size=args.batch_size, history=history, model_dir=model_dir, weights=best_model_wts)
 
 if __name__ == '__main__':
     # Command-line arguments
