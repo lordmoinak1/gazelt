@@ -551,7 +551,7 @@ def evaluate_gazelt(model, device, loss_fxn, dataset, split, batch_size, history
     running_loss = 0.
     y_true, y_hat = [], []
     with torch.no_grad():
-        for i, (x, _, y) in pbar:
+        for i, (x, _, _, y) in pbar:
             x = x.to(device)
             y = y.to(device)
 
