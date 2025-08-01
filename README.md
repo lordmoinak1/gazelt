@@ -4,6 +4,10 @@
 **Status**: Under Review
 
 ---
+![Architecture Diagram](https://github.com/user-attachments/files/21555092/figure2.pdf)
+*Figure 1: Overview of the GazeLT architecture showing visual attention guidance for long-tailed disease classification.*
+
+---
 
 ## 🔗 Resources
 
