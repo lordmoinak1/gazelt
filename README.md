@@ -5,9 +5,34 @@
 
 Under review.
 
-## To do
-- Google Colab notebook will be available soon...
-- full pipeline to be added, weights are huge (trying to upload to gdrive/box)...
+## Training
+```bash
+CUDA_VISIBLE_DEVICES=X python3 src/main_gazelt.py \
+                    --data_dir /path/to/nih/images \
+                    --label_dir /path/to/LongTailCXR/labels \
+                    --out_dir nih_results_gazelt \
+                    --dataset nih-cxr-lt \
+                    --loss ldam \
+                    --rw_method sklearn \
+                    --drw \
+                    --max_epochs 100 \
+                    --patience 15 \
+                    --batch_size 256 \
+                    --lr 1e-4 \
+
+CUDA_VISIBLE_DEVICES=2 python src/main_gazelt.py \
+                    --data_dir /path/to/physionet.org/files/mimic-cxr-jpg/2.0.0 \
+                    --label_dir /path/to/LongTailCXR/labels \
+                    --out_dir mimic_results_gazelt \
+                    --dataset mimic-cxr-lt \
+                    --loss ldam \
+                    --rw_method sklearn \
+                    --drw \
+                    --max_epochs 100 \
+                    --patience 15 \
+                    --batch_size 256 \
+                    --lr 1e-4 \
+```
   
 ## Citation
 If you find this repository useful, please consider giving a star :star: and cite the following
