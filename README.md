@@ -5,7 +5,7 @@
 
 ---
 ![Architecture Diagram](https://github.com/user-attachments/files/21555092/figure2.pdf)
-*Figure: GazeLT employs a teacher-student framework where the teacher, trained on radiologists’ visual attention via TW-I and TW-D components using `$\mathcal{L}{I-tVAL}$` and $\mathcal{L}{D-tVAL}$, guides the student by distilling knowledge with $\mathcal{L}{BD}$ alongside the long-tailed loss `\mathcal{L}_{LT}`.*
+*Figure: GazeLT uses a teacher-student framework where the teacher is trained on radiologists’ visual attention via two components, TW-I and TW-D. The student learns by distilling knowledge from the teacher along with a long-tailed loss.*
 
 ---
 
