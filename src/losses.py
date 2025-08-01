@@ -1,6 +1,13 @@
 import numpy as np
+
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
+
+import sys
+if not sys.warnoptions:
+    import warnings
+    warnings.simplefilter("ignore")
 
 def get_loss(args, weights, train_dataset):
     if args.loss == 'ce':
@@ -46,3 +53,16 @@ class LDAMLoss(torch.nn.Module):
         output = torch.where(index, x_m, x)
 
         return F.cross_entropy(self.s*output, target, weight=self.weight)
+
+def global_loss(x, y):
+    return (F.normalize(x.pow(2).mean(1).view(x.size(0), -1)) - F.normalize(y.pow(2).mean(1).view(y.size(0), -1))).pow(2).mean()
+
+def focal_loss(x, y):
+    return (F.normalize(x.pow(2).mean(1).view(x.size(0), -1)) - F.normalize(y.pow(2).mean(1).view(y.size(0), -1))).pow(2).mean()
+
+def bhattacharyya_loss(student, focal_teacher, global_teacher):
+    lambda_0 = 0.5
+    lambda_1 = 0.5
+    out_focal = nn.KLDivLoss(reduction="batchmean", log_target=True)(F.log_softmax(student, dim=1), F.log_softmax(focal_teacher, dim=1))
+    out_global = nn.KLDivLoss(reduction="batchmean", log_target=True)(F.log_softmax(student, dim=1), F.log_softmax(global_teacher, dim=1))
+    return lambda_0*out_focal+lambda_1*out_global
