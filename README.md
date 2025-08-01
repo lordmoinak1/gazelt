@@ -18,7 +18,7 @@
   mkdir -p data/mimic
   ```
 
-  Place NIH images (and metadata if needed) into: data/nih/
+  Place NIH images (and metadata if needed) into: data/nih/ \\
   Place MIMIC-CXR-JPG files into: data/mimic/
 - **Label Files**:
   - Download and place inside a `labels/` directory:
