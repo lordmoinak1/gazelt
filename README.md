@@ -52,7 +52,7 @@ conda activate gazelt_env
 ```
 
 ## Install dependencies
-```pip install -r requirements.txt```
+```pip3 install -r requirements.txt```
 
 
 ## 🚀 Training Instructions
