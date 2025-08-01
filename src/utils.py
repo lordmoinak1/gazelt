@@ -7,6 +7,8 @@ import pandas as pd
 import torch
 import tqdm
 
+from torchvision.models.feature_extraction import get_graph_node_names, create_feature_extractor
+
 from copy import deepcopy
 
 from mlxtend.plotting import plot_confusion_matrix
