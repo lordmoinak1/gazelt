@@ -90,7 +90,7 @@ conda activate gazelt_env
       --model_path tw/weights/global_epoch_99_attentionloss_0.002267777990709874.pt \
       --data_path data/mimic \
       --labels_path labels \
-      --save_features_path tw/features/nih
+      --save_features_path tw/features/mimic
 
   python3 src/gaze_models.py \
       --focal \
@@ -98,7 +98,7 @@ conda activate gazelt_env
       --model_path tw/weights/focal_epoch_99_attentionloss_0.0024850438985595247.pt \
       --data_path data/mimic \
       --labels_path labels \
-      --save_features_path tw/features/nih
+      --save_features_path tw/features/mimic
 ```
 
 ---
