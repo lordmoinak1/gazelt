@@ -29,7 +29,7 @@ conda activate gazelt_env
 
 
 ## 🚀 Training Instructions
-# NIH-CXR-LT
+### NIH-CXR-LT
 
 ```bash
 CUDA_VISIBLE_DEVICES=X python3 src/main_gazelt.py \
@@ -45,7 +45,7 @@ CUDA_VISIBLE_DEVICES=X python3 src/main_gazelt.py \
                     --batch_size 256 \
                     --lr 1e-4 \
 ```
-# MIMIC-CXR-LT
+### MIMIC-CXR-LT
 ```bash
 CUDA_VISIBLE_DEVICES=X python src/main_gazelt.py \
                     --data_dir /path/to/physionet.org/files/mimic-cxr-jpg/2.0.0 \
