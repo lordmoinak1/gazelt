@@ -182,127 +182,164 @@ class FocalTeacher(torch.nn.Module):
         x_focal = self.focal_linear(x_focal.squeeze()) 
         return x_focal
     
-def generate_features_global_nih(model_path=None, data_path=None, labels_path=None, save_path=None):
-    model = GlobalTeacher(data_path)
+def generate_features_global_nih(model_path=None, data_path=None, labels_path=None, save_path=None, mode=None):
+    model = GlobalTeacher(model_path)
     model = model.to(device)
 
-    train_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='train')
-    val_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='balanced-val')
-    bal_test_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='test')
+    train_dataset = NIH_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='train')
+    val_dataset = NIH_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='balanced-val')
+    test_dataset = NIH_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='test')
+    bal_test_dataset = NIH_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='balanced-test')
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True) #, worker_init_fn=worker_init_fn)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
-    test_loader = torch.utils.data.DataLoader(bal_test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
+    bal_test_loader = torch.utils.data.DataLoader(bal_test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
 
-    for images, _, name in tqdm(test_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+    if mode == 'bal':
+        for images, _, name in tqdm(bal_test_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+    else:
+        for images, _, name in tqdm(test_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
-    for images, _, name in tqdm(train_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+        for images, _, name in tqdm(train_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
-    for images, _, name in tqdm(val_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+        for images, _, name in tqdm(val_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
-def generate_features_focal_nih(model_path=None, data_path=None, labels_path=None, save_path=None):
-    model = FocalTeacher(data_path)
+def generate_features_focal_nih(model_path=None, data_path=None, labels_path=None, save_path=None, mode=None):
+    model = FocalTeacher(model_path)
     model = model.to(device)
 
-    train_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='train')
-    val_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='balanced-val')
-    bal_test_dataset = NIH_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='test')
+    train_dataset = NIH_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='train')
+    val_dataset = NIH_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='balanced-val')
+    test_dataset = NIH_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='test')
+    bal_test_dataset = NIH_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='balanced-test')
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True) #, worker_init_fn=worker_init_fn)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
-    test_loader = torch.utils.data.DataLoader(bal_test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
+    bal_test_loader = torch.utils.data.DataLoader(bal_test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
 
-    for images, _, name in tqdm(test_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+    if mode == 'bal':
+        for images, _, name in tqdm(bal_test_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+    else:
+        for images, _, name in tqdm(test_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
-    for images, _, name in tqdm(train_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+        for images, _, name in tqdm(train_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
-    for images, _, name in tqdm(val_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+        for images, _, name in tqdm(val_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
-def generate_features_global_mimic(model_path=None, data_path=None, labels_path=None, save_path=None):
-    model = GlobalTeacher(data_path)
-    model = model.to(device)
-    model.eval()
-
-    train_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='train')
-    val_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='balanced-val')
-    bal_test_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='test')
-
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True) #, worker_init_fn=worker_init_fn)
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
-    test_loader = torch.utils.data.DataLoader(bal_test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
-
-    for images, _, name in tqdm(test_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
-
-    for images, _, name in tqdm(train_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
-
-    for images, _, name in tqdm(val_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
-
-def generate_features_focal_mimic(model_path=None, data_path=None, labels_path=None, save_path=None):
-    model = FocalTeacher(data_path)
+def generate_features_global_mimic(model_path=None, data_path=None, labels_path=None, save_path=None, mode=None):
+    model = GlobalTeacher(model_path)
     model = model.to(device)
     model.eval()
 
-    train_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='train')
-    val_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='balanced-val')
-    bal_test_dataset = MIMIC_CXR_Dataset(data_dir=data_path, label_dir=labels_path, split='test')
+    train_dataset = MIMIC_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='train')
+    val_dataset = MIMIC_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='balanced-val')
+    test_dataset = MIMIC_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='test')
+    bal_test_dataset = MIMIC_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='balanced-test')
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True) #, worker_init_fn=worker_init_fn)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
-    test_loader = torch.utils.data.DataLoader(bal_test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
+    bal_test_loader = torch.utils.data.DataLoader(bal_test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
 
-    for images, _, name in tqdm(test_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+    if mode == 'bal':
+        for images, _, name in tqdm(bal_test_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+    else:
+        for images, _, name in tqdm(test_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
-    for images, _, name in tqdm(train_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+        for images, _, name in tqdm(train_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
-    for images, _, name in tqdm(val_loader):
-        images = images.to(device)
-        with torch.no_grad():
-            outputs = model(images)
-        np.save(os.path.join(save_features_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+        for images, _, name in tqdm(val_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'global_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+
+def generate_features_focal_mimic(model_path=None, data_path=None, labels_path=None, save_path=None, mode=None):
+    model = FocalTeacher(model_path)
+    model = model.to(device)
+    model.eval()
+
+    train_dataset = MIMIC_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='train')
+    val_dataset = MIMIC_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='balanced-val')
+    test_dataset = MIMIC_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='test')
+    bal_test_dataset = MIMIC_CXR_Dataset_FE(data_dir=data_path, label_dir=labels_path, split='balanced-test')
+
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True) #, worker_init_fn=worker_init_fn)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
+    bal_test_loader = torch.utils.data.DataLoader(bal_test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True) #), worker_init_fn=val_worker_init_fn)
+
+
+    if mode == 'bal':
+        for images, _, name in tqdm(bal_test_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+    else:
+        for images, _, name in tqdm(test_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+
+        for images, _, name in tqdm(train_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
+
+        for images, _, name in tqdm(val_loader):
+            images = images.to(device)
+            with torch.no_grad():
+                outputs = model(images)
+            np.save(os.path.join(save_path, 'focal_{}.npy'.format(name[0])), outputs.detach().cpu().numpy())
 
 def main():
     parser = argparse.ArgumentParser(description="Feature Generator for NIH and MIMIC datasets")
@@ -324,6 +361,8 @@ def main():
                         help='Path to the label files')
     parser.add_argument('--save_features_path', type=str, required=True,
                         help='Path to save extracted features')
+    parser.add_argument('--mode', type=str, required=False,
+                    help='mode')
 
     args = parser.parse_args()
 
@@ -331,13 +370,13 @@ def main():
     os.makedirs(args.save_features_path, exist_ok=True)
 
     if args.global_features and args.use_nih:
-        generate_features_global_nih(args.model_path, args.data_path, args.labels_path, args.save_features_path)
+        generate_features_global_nih(args.model_path, args.data_path, args.labels_path, args.save_features_path, args.mode)
     elif args.focal_features and args.use_nih:
-        generate_features_focal_nih(args.model_path, args.data_path, args.labels_path, args.save_features_path)
+        generate_features_focal_nih(args.model_path, args.data_path, args.labels_path, args.save_features_path, args.mode)
     elif args.global_features and args.use_mimic:
-        generate_features_global_mimic(args.model_path, args.data_path, args.labels_path, args.save_features_path)
+        generate_features_global_mimic(args.model_path, args.data_path, args.labels_path, args.save_features_path, args.mode)
     elif args.focal_features and args.use_mimic:
-        generate_features_focal_mimic(args.model_path, args.data_path, args.labels_path, args.save_features_path)
+        generate_features_focal_mimic(args.model_path, args.data_path, args.labels_path, args.save_features_path, args.mode)
     else:
         print("❌ Please specify one of: --global or --focal and one of: --nih or --mimic")
 
